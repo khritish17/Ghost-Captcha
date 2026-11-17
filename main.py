@@ -1,6 +1,6 @@
 import random
 from PIL import Image, ImageDraw, ImageFont
-import os
+import os, copy
 
 class GhostCaptcha:
     def __init__(self, frame_count = 5,height = 150, width = 600, captcha_text = "1412", auto_generate = False):
@@ -9,6 +9,7 @@ class GhostCaptcha:
         self.auto_generate = auto_generate
         self.frame_count = frame_count
         self.captcha_text = self.auto_generate_captcha() if self.auto_generate else captcha_text
+        self.dark_color = (89,89,89)
 
     def auto_generate_captcha(self):
         # generates a captcha code of 6 characters
@@ -40,7 +41,7 @@ class GhostCaptcha:
         draw = ImageDraw.Draw(image)
         text = self.captcha_text
         
-        font_path = os.getcwd() + r"\RES\JetBrainsMono-ExtraBold.ttf"
+        font_path = os.getcwd() + r"\RES\Sekuya-Regular.ttf"
         font_size = 10
         while True:
             font = ImageFont.truetype(font_path, font_size)
@@ -67,7 +68,7 @@ class GhostCaptcha:
         draw.text((x, y), text, fill=(0, 0, 0), font = font)
         return image
 
-    def generate_frame(self, ref_image):
+    def generate_frame_stop_motion(self, ref_image):
         ref_pixels =  ref_image.load()
         focus_cordinates = {}
         frames = []
@@ -82,16 +83,58 @@ class GhostCaptcha:
             for x in range(self.width):
                 for y in range(self.height):
                     if (x,y) in focus_cordinates:
-                        ghost_pixel[x,y] = (0,0,0) if focus_cordinates[(x,y)] == 1 else (255,255,255)
+                        ghost_pixel[x,y] = self.dark_color if focus_cordinates[(x,y)] == 1 else (255,255,255)
                     else:
-                        ghost_pixel[x,y] = (0,0,0) if random.getrandbits(1) == 1 else (255,255,255)
+                        ghost_pixel[x,y] = self.dark_color if random.getrandbits(1) == 1 else (255,255,255)
             frames.append(ghost_image)
         return frames
-            
 
+    def generate_frame_dualistic_motion(self, ref_image):    
+        ref_pixels =  ref_image.load()
+        focus_cordinates = {}
+        frames = []
+        noise_downward = [[random.getrandbits(1) for y in range(self.height)] for x in range(self.width)]
+        noise_upward = copy.deepcopy(noise_downward)
+
+        for x in range(self.width):
+            for y in range(self.height):
+                if ref_pixels[x,y] == (0,0,0):
+                    focus_cordinates[(x,y)] = random.getrandbits(1)
+        for _ in range(self.frame_count):
+            ghost_image = Image.new("RGB", (self.width, self.height), color = (255, 255, 255))
+            ghost_pixel = ghost_image.load()
+
+            for x in range(self.width):
+                for y in range(self.height):
+                    if (x,y) in focus_cordinates:
+                        ghost_pixel[x,y] = self.dark_color if noise_upward[x][y] == 1 else (255,255,255)
+                    else:
+                        ghost_pixel[x,y] = (50,50,50) if noise_downward[x][y] == 1 else (255,255,255)
+            
+            frames.append(ghost_image)
+            
+            # update noise
+            for y in range(self.height):
+                temp = noise_downward[self.width - 1][y]
+                temp_up = noise_upward[0][y]
+                for x in range(self.width -1, -1, -1):
+                    X = self.width - 1 - x
+                    if x == 0:
+                        noise_downward[x][y] = temp
+                        noise_upward[X][y] = temp_up
+                        continue
+                    noise_downward[x][y] = noise_downward[x-1][y]
+                    noise_upward[X][y] = noise_upward[X+1][y]
+        return frames
+
+
+
+    
     def generate_gif(self):
         ref_image = self.generate_ref_image()
-        frames = self.generate_frame(ref_image)
+        #frames = self.generate_frame_stop_motion(ref_image)
+        frames = self.generate_frame_dualistic_motion(ref_image)
+        # frames = self.generate_frame_monodesign_motion(ref_image)
         output_path = os.path.join(os.getcwd(), "output_animation.gif")
         frames[0].save(output_path, 
                        save_all=True,
