@@ -1,7 +1,6 @@
 # GhostCaptcha
 
-<img src="https://github.com/khritish17/Ghost-Captcha/blob/master/output_animation.gif" width="600">
-<img width="600" height="150" alt="output_animation" src="https://github.com/user-attachments/assets/e83b8b8b-c677-4fdd-846e-f657b305f9c9" />
+<img src="https://github.com/khritish17/Ghost-Captcha/blob/master/output_animation.gif" width="1000">
 
 A Python prototype for generating **human-legible, ML-hardened CAPTCHA challenges** using animated binary pixel noise and dualistic motion.
 
