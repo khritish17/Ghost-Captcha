@@ -1,10 +1,15 @@
-# GhostCaptcha
-
-<img src="https://github.com/khritish17/Ghost-Captcha/blob/master/output_animation.gif" width="1000">
-
+# GHOST CAPTCHA
 A Python prototype for generating **human-legible, ML-hardened CAPTCHA challenges** using animated binary pixel noise and dualistic motion.
 
 Instead of relying on static text warping alone, `GhostCaptcha` renders a reference text image and synthesizes multi-frame GIF animations where character pixels and background pixels evolve under opposing horizontal noise shifts—making individual frames noisy while keeping the text perceivable in motion.
+
+## GHOST CAPTCHA (.gif)
+<img src="https://github.com/khritish17/Ghost-Captcha/blob/master/output_animation.gif" width="1000">
+
+## GHOST CAPTCHA appearance when paused or screenshotted
+<img src="https://github.com/khritish17/Ghost-Captcha/blob/master/output.png" width="1000">
+
+### As evident from the above two figures, GHOST CAPTCHA is AI-proof because it relies on motion parallax and temporal obfuscation—shifting 'text-region noise' and 'background noise' in opposing directions across multiple frames—so that any single static screenshot is completely degraded by random pixel static and unreadable by standard OCR or image-recognition models, while the human visual cortex easily integrates the motion over time to effortlessly perceive the moving text.
 
 ## Features
 
@@ -92,6 +97,4 @@ frames = self.generate_frame_stop_motion(ref_image)
 | `generate_gif()` | Generates frames, saves `output_animation.gif` (`duration=10` ms, `loop=0`), and prints `self.captcha_text`. |
 
 ## Notes & Caveats
-
-- **Font Path:** `generate_ref_image()` currently loads `os.getcwd() + r"\RES\Sekuya-Regular.ttf"`. Run the script from the repository root (or replace with `os.path.join(...)` / `pathlib.Path`) so the font resolves cleanly.
-- **Prototype Status:** This is an experimental prototype for exploring animated noise CAPTCHAs; tune `frame_count`, `duration`, and pixel colors (`dark_color` / `(50, 50, 50)`) to balance human legibility against automated solvers.
+> GhostCaptcha is still an early prototype and comes with several key nuances to consider: when rendered at smaller dimensions, the text becomes extremely difficult to recognize through the pixel noise; furthermore, font selection is critical because many typefaces fail to provide a distinct separation between the letter "O" and the digit "0", while other fonts feature strokes that are simply too thin for effective human perception and motion integration.
