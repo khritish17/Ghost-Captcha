@@ -109,7 +109,7 @@ class GhostCaptcha:
                     if (x,y) in focus_cordinates:
                         ghost_pixel[x,y] = self.dark_color if noise_upward[x][y] == 1 else (255,255,255)
                     else:
-                        ghost_pixel[x,y] = (50,50,50) if noise_downward[x][y] == 1 else (255,255,255)
+                        ghost_pixel[x,y] = self.dark_color if noise_downward[x][y] == 1 else (255,255,255)
             
             frames.append(ghost_image)
             
